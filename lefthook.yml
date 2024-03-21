@@ -1,0 +1,5 @@
+pre-commit:
+  commands:
+    frontend-linter:
+      glob: '*.{js,ts,jsx,tsx}' # glob filter for list of files
+      run: yarn eslint {staged_files} # {staged_files} or {all_files} - list of files
