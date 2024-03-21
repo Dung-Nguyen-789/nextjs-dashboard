@@ -1,5 +1,38 @@
+commit-msg:
+  scripts:
+    'template_checker':
+      runner: bash
+
 pre-commit:
   commands:
-    frontend-linter:
-      glob: '*.{js,ts,jsx,tsx}' # glob filter for list of files
-      run: yarn eslint {staged_files} # {staged_files} or {all_files} - list of files
+    stylelint:
+      tags: frontend style
+      glob: '*.js'
+      run: yarn stylelint {staged_files}
+      stage_fixed: true
+    rubocop:
+      tags: backend style
+      glob: '*.rb'
+      exclude: '(^|/)(application|routes)\.rb$'
+      run: bundle exec rubocop --force-exclusion {all_files}
+      stage_fixed: true
+  scripts:
+    'good_job.js':
+      runner: node
+
+pre-push:
+  parallel: true
+  commands:
+    stylelint:
+      tags: frontend style
+      files: git diff --name-only master
+      glob: '*.js'
+      run: yarn stylelint {files}
+    rubocop:
+      tags: backend style
+      files: git diff --name-only master
+      glob: '*.rb'
+      run: bundle exec rubocop --force-exclusion {files}
+  scripts:
+    'verify':
+      runner: sh
